@@ -184,8 +184,8 @@ if (isset($_POST['carte_choisie'])) {
             
             <!-- Boutons -->
             <div class='sidebar-buttons'>
-                <a href='?nouvelle_partie=1'><button class='pixel-btn pixel-btn-red'>Run Info</button></a>
-                <button class='pixel-btn pixel-btn-orange'>Options</button>
+                <a href='accueil.php'><button class='pixel-btn pixel-btn-red'>Accueil</button></a>
+                <a href='?nouvelle_partie=1'><button class='pixel-btn pixel-btn-orange'>Nouvelle Partie</button></a>
             </div>
         </div>
         
