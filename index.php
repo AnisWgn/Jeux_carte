@@ -72,11 +72,11 @@ if (isset($_POST['carte_choisie'])) {
     if (!isset($_SESSION['jeu_joueur1'][$indiceCarte])) {
         echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Erreur</title>";
         echo "<link rel='stylesheet' href='vue/style.css'>";
-        echo "</head><body><div class='container'>";
-        echo "<h1>⚠️ Erreur</h1>";
-        echo "<p>L'indice de la carte sélectionnée n'est plus valide.</p>";
-        echo "<p><a href='?nouvelle_partie=1'><button>🔄 Nouvelle partie</button></a></p>";
-        echo "</div></body></html>";
+        echo "</head><body><div class='game-layout'><div class='main-area'><div class='container'>";
+        echo "<h1>ERREUR</h1>";
+        echo "<p class='error-text'>CARTE INVALIDE</p>";
+        echo "<p><a href='?nouvelle_partie=1'><button>NOUVELLE PARTIE</button></a></p>";
+        echo "</div></div></div></body></html>";
         exit;
     }
     
@@ -85,11 +85,11 @@ if (isset($_POST['carte_choisie'])) {
     } catch (Exception $e) {
         echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Erreur</title>";
         echo "<link rel='stylesheet' href='vue/style.css'>";
-        echo "</head><body><div class='container'>";
-        echo "<h1>⚠️ Erreur</h1>";
-        echo "<p style='color: red;'>" . htmlspecialchars($e->getMessage()) . "</p>";
-        echo "<p><a href='?nouvelle_partie=1'><button>🔄 Nouvelle partie</button></a></p>";
-        echo "</div></body></html>";
+        echo "</head><body><div class='game-layout'><div class='main-area'><div class='container'>";
+        echo "<h1>ERREUR</h1>";
+        echo "<p class='error-text'>" . htmlspecialchars($e->getMessage()) . "</p>";
+        echo "<p><a href='?nouvelle_partie=1'><button>NOUVELLE PARTIE</button></a></p>";
+        echo "</div></div></div></body></html>";
         exit;
     }
     
@@ -121,31 +121,78 @@ if (isset($_POST['carte_choisie'])) {
 <html>
 <head>
     <meta charset='UTF-8'>
-    <title>🎮 Bataille Interactive</title>
+    <title>BATAILLE INTERACTIVE</title>
     <link rel='stylesheet' href='vue/style.css'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 </head>
 <body>
-    <div class='container'>
-        <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;'>
-            <h1 style='margin: 0;'>🎮 Jeu de Bataille Interactive</h1>
-            <a href='?nouvelle_partie=1'><button style='background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); margin: 0;'>🔄 Recommencer</button></a>
+    <div class='game-layout'>
+        <!-- Panneau latéral gauche -->
+        <div class='sidebar'>
+            <!-- En-tête Big Blind -->
+            <div class='big-blind-header'>
+                <div class='big-blind-title'>Bataille</div>
+                <div class='big-blind-badge'>
+                    <div class='badge-icon'>⚔️</div>
+                </div>
+                <div class='big-blind-info'>
+                    <div class='blind-label'>Couleur atout</div>
+                    <div class='blind-value'><?php echo strtoupper($couleurAtout); ?></div>
+                </div>
+            </div>
+            
+            <!-- Scores des joueurs -->
+            <div class='player-scores'>
+                <div class='score-left'>
+                    <div class='score-big'><?php echo $_SESSION['score_joueur1']; ?></div>
+                </div>
+                <div class='vs-symbol'>✕</div>
+                <div class='score-right'>
+                    <div class='score-big'><?php echo $_SESSION['score_joueur2']; ?></div>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class='stats-box'>
+                <div class='stat-item'>
+                    <div class='stat-label'>Mains</div>
+                    <div class='stat-value'><?php echo count($_SESSION['jeu_joueur1']); ?></div>
+                </div>
+                <div class='stat-item'>
+                    <div class='stat-label'>Tours</div>
+                    <div class='stat-value'><?php echo $_SESSION['tour_actuel']; ?></div>
+                </div>
+            </div>
+            
+            <!-- Total en or -->
+            <div class='gold-total'>
+                <div class='gold-symbol'>$</div>
+                <div class='gold-amount'><?php echo $_SESSION['score_joueur1'] + $_SESSION['score_joueur2']; ?></div>
+            </div>
+            
+            <!-- Ante et Round -->
+            <div class='ante-round-box'>
+                <div class='ante-item'>
+                    <div class='ante-label'>Ante</div>
+                    <div class='ante-value'><?php echo count($_SESSION['jeu_joueur1']); ?>/<?php echo count($_SESSION['jeu_joueur1']) + count($_SESSION['jeu_joueur2']); ?></div>
+                </div>
+                <div class='ante-item'>
+                    <div class='ante-label'>Round</div>
+                    <div class='ante-value'><?php echo $_SESSION['tour_actuel']; ?></div>
+                </div>
+            </div>
+            
+            <!-- Boutons -->
+            <div class='sidebar-buttons'>
+                <a href='?nouvelle_partie=1'><button class='pixel-btn pixel-btn-red'>Run Info</button></a>
+                <button class='pixel-btn pixel-btn-orange'>Options</button>
+            </div>
         </div>
         
-        <div class='atout-info'>Couleur atout : <?php echo $couleurAtout; ?></div>
-        
-        <div class='scores'>
-            <div class='score-box player1'>
-                <h2>👤 Vous</h2>
-                <div class='score'><?php echo $_SESSION['score_joueur1']; ?></div>
-                <p>points</p>
-            </div>
-            <div class='score-box player2'>
-                <h2>🤖 Ordinateur</h2>
-                <div class='score'><?php echo $_SESSION['score_joueur2']; ?></div>
-                <p>points</p>
-            </div>
-        </div>
+        <!-- Zone de jeu principale -->
+        <div class='main-area'>
+            
+            <div class='container'>
         
         <?php
         // Si on vient de jouer un tour, afficher le résultat
@@ -155,34 +202,42 @@ if (isset($_POST['carte_choisie'])) {
             $res = $resultat['resultat'];
             
             echo "<div class='resultat-tour'>";
-            echo "<h2>⚔️ Résultat du Tour " . ($_SESSION['tour_actuel'] - 1) . "</h2>";
             
-            echo "<div class='cartes-jouees'>";
-            echo "<div class='carte-jouee'>";
-            echo "<h3>👤 Votre carte</h3>";
-            echo "<p><strong>" . $carte1->getNom() . "</strong></p>";
-            echo "<p>Valeur: <strong>" . $carte1->getValeur() . "</strong></p>";
+            // Afficher le score gagné en grand
+            if ($res['points'] > 0) {
+                echo "<div class='points-popup'>+" . $res['points'] . "</div>";
+            }
+            
+            echo "<h2>RESULTAT TOUR " . ($_SESSION['tour_actuel'] - 1) . "</h2>";
+            
+            echo "<div class='played-cards'>";
+            
+            echo "<figure class='played-card'>";
+            echo "<figcaption class='played-card-title'>JOUEUR</figcaption>";
+            $imageCarte1 = ObtenirImageCarte($carte1);
+                echo "<img src='$imageCarte1' alt='" . $carte1->getNom() . "' class='played-card-image'>";
             if ($carte1->isAtout()) {
-                echo "<p><span class='carte-badge'>ATOUT</span></p>";
+                echo "<span class='played-card-badge'>*</span>";
             }
-            echo "</div>";
+            echo "</figure>";
             
-            echo "<div class='carte-jouee'>";
-            echo "<h3>🤖 Carte ordinateur</h3>";
-            echo "<p><strong>" . $carte2->getNom() . "</strong></p>";
-            echo "<p>Valeur: <strong>" . $carte2->getValeur() . "</strong></p>";
+            echo "<figure class='played-card'>";
+            echo "<figcaption class='played-card-title'>ORDI</figcaption>";
+            $imageCarte2 = ObtenirImageCarte($carte2);
+            echo "<img src='$imageCarte2' alt='" . $carte2->getNom() . "' class='played-card-image'>";
             if ($carte2->isAtout()) {
-                echo "<p><span class='carte-badge'>ATOUT</span></p>";
+                echo "<span class='played-card-badge'>*</span>";
             }
-            echo "</div>";
+            echo "</figure>";
+            
             echo "</div>";
             
             if ($res['gagnant'] == 1) {
-                echo "<div class='resultat-message gagnant'>🏆 Vous gagnez ce tour ! (+" . $res['points'] . " points) 🏆</div>";
+                echo "<div class='resultat-message gagnant'>VICTOIRE! +" . $res['points'] . " POINTS</div>";
             } elseif ($res['gagnant'] == 2) {
-                echo "<div class='resultat-message perdant'>😔 L'ordinateur gagne ce tour ! (+" . $res['points'] . " points)</div>";
+                echo "<div class='resultat-message perdant'>DEFAITE! +" . $res['points'] . " POINTS</div>";
             } else {
-                echo "<div class='resultat-message egalite'>🤝 Égalité ! Aucun point gagné.</div>";
+                echo "<div class='resultat-message egalite'>EGALITE! 0 POINTS</div>";
             }
             echo "</div>";
         }
@@ -194,46 +249,38 @@ if (isset($_POST['carte_choisie'])) {
             $gagnant = $controller->getGagnant();
             
             echo "<div class='partie-terminee'>";
-            echo "<h1>🎉 Partie terminée ! 🎉</h1>";
+            echo "<h1>PARTIE TERMINEE!</h1>";
             if ($gagnant == 1) {
-                echo "<h2 style='color: #4facfe; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);'>🏆 Félicitations ! Vous avez gagné ! 🏆</h2>";
+                echo "<h2 class='winner-text'>VICTOIRE!</h2>";
             } elseif ($gagnant == 2) {
-                echo "<h2 style='color: #fa709a; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);'>😔 L'ordinateur a gagné cette fois...</h2>";
+                echo "<h2 class='loser-text'>DEFAITE!</h2>";
             } else {
-                echo "<h2 style='color: #fddb92; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);'>🤝 Match nul ! 🤝</h2>";
+                echo "<h2 class='draw-text'>EGALITE!</h2>";
             }
-            echo "<p><a href='?nouvelle_partie=1'><button>🔄 Nouvelle partie</button></a></p>";
+            echo "<p><a href='?nouvelle_partie=1'><button>NOUVELLE PARTIE</button></a></p>";
             echo "</div>";
             session_destroy();
         } else {
-            // Afficher le formulaire de choix de carte
-            echo "<div class='tour-header'>";
-            echo "<h2>🎯 Tour " . $_SESSION['tour_actuel'] . "</h2>";
-            echo "<p class='cartes-restantes'>Cartes restantes : " . count($_SESSION['jeu_joueur1']) . " 🃏</p>";
-            echo "</div>";
             
-            echo "<form method='POST' action=''>";
-            echo "<div class='cartes-container'>";
+            echo "<form method='POST' action='' class='card-select-form'>";
             foreach ($_SESSION['jeu_joueur1'] as $index => $carteTab) {
                 $carte = new Carte($carteTab['couleur'], $carteTab['figure']);
+                $imageCarte = ObtenirImageCarte($carte);
                 $isAtout = $carte->isAtout() ? ' carte-atout' : '';
-                echo "<label class='carte-label'>";
-                echo "<input type='radio' name='carte_choisie' value='$index' required>";
-                echo "<div class='carte$isAtout'>";
-                echo "<div class='carte-nom'>" . $carte->getFigure() . "</div>";
-                echo "<div class='carte-valeur'>" . $carte->getCouleur() . "</div>";
-                echo "<div style='font-size: 0.9em; color: #666;'>Valeur: " . $carte->getValeur() . "</div>";
+                echo "<label class='card-choice'>";
+                echo "<input type='radio' name='carte_choisie' value='$index' required class='card-choice-input'>";
+                echo "<img src='$imageCarte' alt='" . $carte->getNom() . "' class='card-choice-image$isAtout'>";
                 if ($carte->isAtout()) {
-                    echo "<div class='carte-badge'>ATOUT</div>";
+                    echo "<span class='card-choice-badge'>*</span>";
                 }
-                echo "</div>";
                 echo "</label>";
             }
-            echo "</div>";
-            echo "<button type='submit' style='display: block; margin: 30px auto;'>🎲 Jouer cette carte</button>";
+            echo "<button type='submit' class='btn-play'>JOUER</button>";
             echo "</form>";
         }
         ?>
+            </div>
+        </div>
     </div>
 </body>
 </html>
